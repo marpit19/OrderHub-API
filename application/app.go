@@ -18,6 +18,10 @@ type App struct {
 	config Config
 }
 
+type AppConfig struct {
+	ServerPort string
+}
+
 func New(config Config) *App {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -39,12 +43,24 @@ func New(config Config) *App {
 }
 
 func (a *App) Start(ctx context.Context) error {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		appConfig := AppConfig{
+			ServerPort: "3000",
+		}
+		port = appConfig.ServerPort
+	}
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%d", a.config.ServerPort),
+		Addr:    fmt.Sprintf(":%s", port),
 		Handler: a.router,
 	}
 
-	err := a.rdb.Ping(ctx).Err()
+	err = a.rdb.Ping(ctx).Err()
 	if err != nil {
 		return fmt.Errorf("failed to connect to redis: %w", err)
 	}

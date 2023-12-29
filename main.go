@@ -1,43 +1,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"net/http"
-	"time"
+	"os"
+	"os/signal"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/marpit19/orders-api/application"
 )
 
 func main() {
-	router := chi.NewRouter()
-	router.Use(middleware.Logger)
+	app := application.New()
 
-	router.Get("/hello", basicHandler)
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
-	server := &http.Server{
-		Addr:    ":3000",
-		Handler: router,
-	}
-
-	stopServerAfterDelay(server, 10*time.Second)
-
-	err := server.ListenAndServe()
+	err := app.Start(ctx)
 	if err != nil {
-		fmt.Println("failed to listen", err)
+		fmt.Println("failed to start app:", err)
 	}
-}
-
-func basicHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("yo bro!"))
-}
-
-func stopServerAfterDelay(server *http.Server, delay time.Duration) {
-	time.AfterFunc(delay, func() {
-		fmt.Println("Stopping the server.....")
-		err := server.Close()
-		if err != nil {
-			fmt.Println("Error while stopping the server:", err)
-		}
-	})
 }

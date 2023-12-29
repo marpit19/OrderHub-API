@@ -4,19 +4,27 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func main() {
+	router := chi.NewRouter()
+	router.Use(middleware.Logger)
+
+	router.Get("/hello", basicHandler)
+
 	server := &http.Server{
 		Addr:    ":3000",
-		Handler: http.HandlerFunc(basicHandler),
+		Handler: router,
 	}
 
 	stopServerAfterDelay(server, 10*time.Second)
 
 	err := server.ListenAndServe()
 	if err != nil {
-		fmt.Print("failed to listen", err)
+		fmt.Println("failed to listen", err)
 	}
 }
 

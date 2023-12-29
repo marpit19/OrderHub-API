@@ -1,5 +1,7 @@
 # OrderHub API
 
+[![OrderHub API Banner](images/banner.jpeg)](https://orderhub-api.onrender.com/orders)
+
 OrderHub API is a RESTful service built with Go (Golang) and Chi router. This API manages orders with functionalities such as creation, retrieval, update, and deletion. The application utilizes Redis as a database for storing order information and implements pagination for improved data handling.
 
 ## Features
